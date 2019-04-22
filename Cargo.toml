@@ -1,0 +1,12 @@
+[package]
+name = "ens"
+version = "0.1.0"
+authors = ["David Lutterkort <lutter@watzmann.net>"]
+edition = "2018"
+
+[dependencies]
+hex-slice="0.1.4"
+serde = { version = "1.0", features = ["derive"] }
+serde_derive = "1.0"
+serde_json = { version = "1.0", features = ["arbitrary_precision"] }
+tiny-keccak = "1.0"
