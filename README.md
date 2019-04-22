@@ -2,7 +2,7 @@ Convert ENS's rainbow table data into a CSV format we can ingest with Postgres' 
 
 Download input for rainbow tables via `gsutil cp gs://ens-files/* .`
 
-Run this as `cat preimages-* | cargo run --release > data.csv`. The output is a CSV with quote ' and delimiter |
+Run this as `cat preimages-* | cargo run --release > data.csv`. The output is a CSV with quote `'` and delimiter `|`
 
 Takes a while (10 minutes) on my machine and results in a 30GB file (133M entities)
 
