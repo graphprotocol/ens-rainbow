@@ -1,0 +1,41 @@
+#! /bin/bash
+
+# Query a list of domain ids for ENS and for each of these id's, query
+# the subdomains
+
+ens_url="https://api.staging.thegraph.com/subgraphs/name/fordn/ens_names"
+
+# How many ids to process and where to start in the list of domains
+first=100
+skip=$(( $RANDOM * 10 ))
+
+echo "skip: $skip"
+
+list="{ \"query\": \"query{ domains(first: $first, skip: $skip) { id } }\"}"
+subdomains=$(echo 'query getSubdomains($id: ID!) {
+    domain(id: $id) {
+      id
+      labelName
+      subdomains {
+        id
+        labelName
+      }
+    }
+  }' | tr '\n' ' ')
+
+ids=$(curl -s -X POST -d "$list" "$ens_url" | jq -r '.data.domains | .[].id')
+
+total=0
+for id in $ids
+do
+    echo "id: $id"
+    q=$(printf "{ \"query\": \"%s\", \"variables\": { \"id\": \"%s\" } }" "$subdomains" "$id")
+    t=$(curl -s -o /tmp/ens.json -w '%{time_total}\n' -X POST -d "$q" "$ens_url")
+    echo "time: $t"
+    total=$(echo "$total + $t" | bc -l)
+    echo -n "subdomains: "
+    jq '.data.domain.subdomains | length' < /tmp/ens.json
+    echo
+done
+
+echo "total: $total"

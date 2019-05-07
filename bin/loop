@@ -1,0 +1,11 @@
+#! /bin/bash
+
+# Run the query script 10 times and send its output to /var/tmp/ens/qNNN.txt
+
+mkdir -p /var/tmp/ens
+
+dir=$(dirname $0)
+for i in $(seq 1 10)
+do
+    $dir/query > /var/tmp/ens/q$i.txt &
+done
