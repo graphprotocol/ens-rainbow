@@ -3,11 +3,19 @@
 # Query a list of domain ids for ENS and for each of these id's, query
 # the subdomains
 
+# Staging with rainbow data
 ens_url="https://api.staging.thegraph.com/subgraphs/name/fordn/ens_names"
-
+# Prod without rainbow data
+#ens_url="https://api.thegraph.com/subgraphs/name/ensdomains/ens"
 # How many ids to process and where to start in the list of domains
 first=100
-skip=$(( $RANDOM * 10 ))
+skip=$(( $RANDOM * 7 ))
+
+tmp=$(mktemp /tmp/ensXXXXXX.json)
+function cleanup() {
+    rm -f $tmp
+}
+trap cleanup EXIT
 
 echo "skip: $skip"
 
@@ -30,11 +38,11 @@ for id in $ids
 do
     echo "id: $id"
     q=$(printf "{ \"query\": \"%s\", \"variables\": { \"id\": \"%s\" } }" "$subdomains" "$id")
-    t=$(curl -s -o /tmp/ens.json -w '%{time_total}\n' -X POST -d "$q" "$ens_url")
+    t=$(curl -s -o "$tmp" -w '%{time_total}\n' -X POST -d "$q" "$ens_url")
     echo "time: $t"
     total=$(echo "$total + $t" | bc -l)
     echo -n "subdomains: "
-    jq '.data.domain.subdomains | length' < /tmp/ens.json
+    jq '.data.domain.subdomains | length' < "$tmp" || (echo "error in response:"; cat "$tmp")
     echo
 done
 
