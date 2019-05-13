@@ -15,13 +15,12 @@ struct Entry {
 }
 
 fn main() {
-    println!("'entity'|'id'|'data'");
     for e in Deserializer::from_reader(io::stdin()).into_iter::<Entry>() {
         let name = e.unwrap().name;
         let keccak_hash = k::keccak256(name.as_bytes());
         let formatted_keccak = format!("0x{}", hex::encode(keccak_hash));
 
-        println!("'Name'|'{hash}'|'{{\"id\": {{\"data\": \"{hash}\", \"type\": \"String\"}}, \"name\": {{\"data\": \"{name}\", \"type\": \"String\"}} }}'",
+        println!("Name,{hash},\"{{\"\"id\"\": {{\"\"data\"\": \"\"{hash}\"\", \"\"type\"\": \"\"String\"\"}}, \"\"name\"\": {{\"\"data\"\": \"\"{name}\"\", \"\"type\"\": \"\"String\"\"}}}}\"",
                 hash=formatted_keccak, name=name);
     }
 }
