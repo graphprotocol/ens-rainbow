@@ -1,15 +1,11 @@
-Convert ENS's rainbow table data into a CSV format we can ingest with Postgres' `COPY`.
+Convert ENS's rainbow table data into a SQL script that we can ingest with
+`psql`, similar to a plain text dump from `pg_dump`.
 
 Download input for rainbow tables via `gsutil cp gs://ens-files/* .`
 
-Run this as `cat preimages-* | cargo run --release > data.csv`. The output is a CSV with quote `'` and delimiter `|`
+Run this as `cat preimages-* | cargo run --release | gzip > data.sql`.
 
-Takes a while (10 minutes) on my machine and results in a 30GB file (133M entities)
-
-Could be made faster by matching regexps instead of deserializing JSON and probably by mmapping files instead of reading from stdin
-
-**IMPORTANT:** we need to better document the transformation that was made
-when importing this into staging.
+Takes a while (10 minutes) on my machine and results in a 6GB file (133M entities)
 
 ## Data import and export
 
@@ -19,7 +15,7 @@ pg_dump -c -O --no-tablespaces -t ens_names -f /var/tmp/ens_names.sql.gz -Z9
 ```
 
 The data is available in [Google cloud
-storage](https://storage.cloud.google.com/subgraph-dumps/ens_names.sql.gz)
+storage](https://storage.cloud.google.com/ens-files/ens_names.sql.gz)
 
 ### Importing it into production:
 1. Make sure the `ens_names` table exists (in psql):
