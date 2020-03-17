@@ -15,7 +15,9 @@ pg_dump -c -O --no-tablespaces -t ens_names -f /var/tmp/ens_names.sql.gz -Z9
 ```
 
 The data is available in [Google cloud
-storage](https://storage.cloud.google.com/ens-files/ens_names.sql.gz)
+storage](https://storage.cloud.google.com/ens-files/ens_names.sql.gz) There
+is also a manually generated
+[addendum](https://storage.cloud.google.com/ens-files/ens_names_2.csv.gz)
 
 ### Importing it into production:
 1. Make sure the `ens_names` table exists (in psql):
@@ -28,6 +30,10 @@ create table if not exists public.ens_names(
 2. Import the dump:
 ```
 zcat ens_names.sql.gz | psql graph
+```
+2a. Import the addendum:
+```
+zcat ens_names_2.csv.gz | psql -c 'copy ens_names(name, hash) from stdin with (format csv)'
 ```
 3. Create a foreign key index on `data->'parent'->>'data'`:
 ```
