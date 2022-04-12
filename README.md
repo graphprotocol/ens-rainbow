@@ -5,19 +5,13 @@ need to be able to run `psql` and connect to the `graph-node` database. If
 your database is sharded, this data needs to be imported into the primary
 database
 
-1. Download two data files from Goolge cloud storage:
+1. Download the SQL dump file from Goolge cloud storage:
 [ens_names.sql.gz](https://storage.cloud.google.com/ens-files/ens_names.sql.gz)
-and
-[ens_names_2.csv.gz](https://storage.cloud.google.com/ens-files/ens_names_2.csv.gz)
+
 
 2. Import the dump:
 ```
 zcat ens_names.sql.gz | psql graph
-```
-2a. Import the addendum:
-```
-zcat ens_names_2.csv.gz | psql -c 'copy ens_names(name, hash) from stdin
-with (format csv)
 ```
 
 ## Data preparation
@@ -28,7 +22,7 @@ needed for just importing that data.
 Convert ENS's rainbow table data into a SQL script that we can ingest with
 `psql`, similar to a plain text dump from `pg_dump`.
 
-Download input for rainbow tables via `gsutil cp gs://ens-files/* .`
+Download input for rainbow tables via `gsutil cp gs://ens-files/preimages/* .`
 
 Run this as `cat preimages-* | cargo run --release | gzip > data.sql`.
 
