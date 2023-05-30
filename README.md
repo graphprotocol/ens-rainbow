@@ -5,13 +5,23 @@ need to be able to run `psql` and connect to the `graph-node` database. If
 your database is sharded, this data needs to be imported into the primary
 database
 
-1. Download the SQL dump file from Goolge cloud storage:
-[ens_names.sql.gz](https://storage.cloud.google.com/ens-files/ens_names.sql.gz)
+#### Download the SQL dump file from Goolge cloud storage:
+  * Compressed with `gzip` (5.9 GB):
+    [ens_names.sql.gz](https://storage.cloud.google.com/ens-files/ens_names.sql.gz) ([sha256](https://storage.googleapis.com/ens-files/ens_names.sql.gz.sha256sum))
+  * Compressed with `zstd` (5.6 GB):
+    [ens_names.sql.zst](https://storage.googleapis.com/ens-files/ens_names.sql.zst) ([sha256](https://storage.googleapis.com/ens-files/ens_names.sql.zst.sha256sum))
 
+#### Import the dump:
 
-2. Import the dump:
+The `psql` command for the import has to be run as the same user as the
+user that `graph-node` uses to connect to the database.
+
 ```
 zcat ens_names.sql.gz | psql graph
+```
+or
+```
+zstdcat ens_names.sql.zst | psql graph
 ```
 
 ## Data preparation
@@ -30,5 +40,5 @@ Takes a while (10 minutes) on my machine and results in a 6GB file (133M entitie
 
 ### Exporting the prepared data:
 ```
-pg_dump -c -O --no-tablespaces -t ens_names -f /var/tmp/ens_names.sql.gz -Z9
+pg_dump -c -x -O --if-exists --no-tablespaces -t ens_names -f /var/tmp/ens_names.sql.gz -Z9
 ```
